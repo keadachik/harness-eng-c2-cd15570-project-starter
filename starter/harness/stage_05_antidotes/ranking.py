@@ -22,4 +22,10 @@ def validate(tool_input: dict[str, Any]) -> str | None:
     # TODO: Check weight names against SUPPORTED_METRICS and reject any
     # negative weight. The ranking handler already handles metrics where
     # lower values are better; a negative weight would reverse them twice.
-    raise NotImplementedError("Implement ranking-weight validation.")
+    weights = tool_input.get("weights", {})
+    for name, value in weights.items():
+        if name not in SUPPORTED_METRICS:
+            return f"Unsupported metric: {name}"
+        if value < 0:
+            return f"Negative weight not allowed: {name}={value}"
+    return None
