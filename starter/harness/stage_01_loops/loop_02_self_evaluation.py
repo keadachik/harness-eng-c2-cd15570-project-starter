@@ -33,10 +33,18 @@ class SelfEvaluationLoop(HarnessLoop):
         """Attach a separate review only after completion or iteration limit."""
         if result["status"] not in {"complete", "iteration_limit"}:
             return result
-        # TODO: On a finished result, call run_retrospective_evaluation with
-        # self.client, self.deployment, self.original_prompt,
-        # state.execution_trace, state.tool_run_log, the final response text,
-        # and the result status. Pass every one of these by keyword, not
-        # position. Print the review and store it under result["evaluation"]
-        # so main.py writes the JSON artifact.
-        raise NotImplementedError("Implement the Loop 02 retrospective review.")
+        response = result["response"]
+        final_output = getattr(response, "output_text", "") or ""
+        evaluation = run_retrospective_evaluation(
+            client=self.client,
+            deployment=self.deployment,
+            original_prompt=self.original_prompt,
+            execution_trace=self.state.execution_trace,
+            tool_run_log=self.state.tool_run_log,
+            final_output=final_output,
+            task_result=result["status"],
+        )
+        print("\n========== RETROSPECTIVE EVALUATION ==========")
+        print(evaluation)
+        result["evaluation"] = evaluation
+        return result

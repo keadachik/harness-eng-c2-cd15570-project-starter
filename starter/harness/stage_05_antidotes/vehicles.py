@@ -9,4 +9,7 @@ def validate(tool_input: dict[str, Any]) -> str | None:
     """Return a reason when compare_vehicles repeats a stock ID."""
     # TODO: Compare stock_ids with its unique set. Repeating a vehicle can
     # make a comparison look broader than it is.
-    raise NotImplementedError("Implement duplicate-vehicle validation.")
+    ids = tool_input.get("stock_ids", [])
+    if len(ids) != len(set(ids)):
+        return "Duplicate stock IDs found in comparison."
+    return None
